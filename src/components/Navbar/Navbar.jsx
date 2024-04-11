@@ -1,4 +1,3 @@
-import React from "react";
 import "./Navbar.css";
 import menu_icon from "../../assets/menu.png";
 import logo from "../../assets/logo.png";
@@ -8,11 +7,17 @@ import more_icon from "../../assets/more.png";
 import notification_icon from "../../assets/notification.png";
 import profile_icon from "../../assets/jack.png";
 
-const Navbar = () => {
+// eslint-disable-next-line react/prop-types
+const Navbar = ({ setSidebar }) => {
   return (
     <nav className="flex-div">
       <div className="nav-left flex-div">
-        <img className="menu-icon" src={menu_icon} />
+        <img
+          className="menu-icon"
+          onClick={() => setSidebar((prev) => (prev === false ? true : false))}
+          src={menu_icon}
+          alt=""
+        />
         <img className="logo" src={logo} />
       </div>
 
