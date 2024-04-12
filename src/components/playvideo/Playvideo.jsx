@@ -4,34 +4,79 @@ import like from "../../assets/like.png";
 import dislike from "../../assets/dislike.png";
 import share from "../../assets/share.png";
 import save from "../../assets/save.png";
-import jack from "../../assets/jack.png";
-import user_profile from "../../assets/user_profile.jpg";
+// import jack from "../../assets/jack.png";
+// import user_profile from "../../assets/user_profile.jpg";
+import { useEffect, useState } from "react";
+import { API_KEY, value_conveter } from "../../data";
 
-// eslint-disable-next-line react/prop-types
-const Playvideo = ({ videoId }) => {
+import moment from "moment";
+import { useParams } from "react-router-dom";
+
+const Playvideo = () => {
+  const { videoId } = useParams();
+  // eslint-disable-next-line no-unused-vars
+  const [apiData, setApiData] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [channelData, setChannelData] = useState(null);
+  const [commentData, setCommentData] = useState([]);
+
+  // eslint-disable-next-line no-unused-vars
+  const fetchvideoData = async () => {
+    // eslint-disable-next-line no-undef, no-unused-vars
+    const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=US&videoCategoryId=${videoId}&key=${API_KEY} `;
+    await fetch(videoDetails_url)
+      .then((res) => res.json())
+      .then((data) => setApiData(data.items[0]));
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  const fetchOtherData = async () => {
+    // eslint-disable-next-line no-unused-vars
+    const channelData_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData.snippet.channelId}&key=${API_KEY} `;
+    await fetch(channelData_url)
+      .then((res) => res.json())
+      .then((data) => setChannelData(data.items[0]));
+
+    // eslint-disable-next-line no-unused-vars
+    const comment_url = `https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet%2Creplies&maxResults=50&videoId=${videoId}&key=${API_KEY} `;
+    await fetch(comment_url)
+      .then((res) => res.json())
+      .then((data) => setCommentData(data.items));
+  };
+
+  useEffect(() => {
+    fetchvideoData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoId]);
+
+  useEffect(() => {
+    fetchOtherData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="play-video">
       {/* <video src={video1} controls autoPlay muted></video> */}
       {/* <iframe width="1040" height="585" src="https://www.youtube.com/embed/7D4vNcK6D38" title="Coke Studio | Season 14 | Tu Jhoom | Naseebo Lal x Abida Parveen" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> */}
 
       <iframe
-        src={`https://www.youtube.com/embed/${videoId}`}
-        // eslint-disable-next-line react/no-unknown-property
-        frameborder="0"
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
       ></iframe>
-      <h3>
-        The world is a book and those who do not travel read only one page.
-      </h3>
+      <h3>{apiData ? apiData.snippet.title : "Title here"}</h3>
       <div className="play-video-info">
-        <p>1525 Views &bull; 3 days ago</p>
+        <p>
+          {apiData ? value_conveter(apiData.statistics.viewCount) : "16k"} Views
+          &bull; {apiData ? moment(apiData.snippet.publishedAt).fromNow() : ""}
+        </p>
         <div>
           <span>
-            <img src={like} alt="" /> 125
+            <img src={like} alt="" />{" "}
+            {apiData ? value_conveter(apiData.statistics.likeCount) : 155}
           </span>
           <span>
-            <img src={dislike} alt="" /> 125
+            <img src={dislike} alt="" />
           </span>
           <span>
             <img src={share} alt="" />
@@ -51,86 +96,59 @@ const Playvideo = ({ videoId }) => {
       </div>
       <hr />
       <div className="publisher">
-        <img src={jack} alt="" />
+        <img
+          src={channelData ? channelData.snippet.thumbnail.default.url : ""}
+          alt=""
+        />
         <div>
-          <p>Tayyaba Podcast</p>
-          <span>1M Subscribers</span>
+          <p>{apiData ? apiData.snippet.channelTitle : ""}</p>
+          <span>
+            {channelData
+              ? value_conveter(channelData.statistics.subscriberCount)
+              : "1M"}{" "}
+            Subscribers
+          </span>
         </div>
         <button>Subscribes</button>
       </div>
       <div className="vid-description">
-        <p>Failures are the part of life</p>
-        <p>Subscribe Life Change to watch more tutorials on life failures</p>
+        <p>
+          {apiData
+            ? apiData.snippet.description.slice(0, 250)
+            : "Description Here"}
+        </p>
+
         <hr />
-        <h4>130 Comments</h4>
-        <div className="comment">
-          <img src={user_profile} alt="" />
-          <div>
-            <h3>
-              Jack Nicholson <span>1 day ago</span>
-            </h3>
-            <p>
-              I enjoy my alone time, I can do what I want, no interuptions, dont
-              have to talk or listen.Thanks a lot for such wonderfull video.
-            </p>
-            <div className="comment-action">
-              <img src={like} alt="" />
-              <span>244</span>
-              <img src={like} alt="" />
+        <h4>
+          {apiData ? value_conveter(apiData.statistics.commentCount) : 102}
+          Comments
+        </h4>
+        {commentData.map((item, index) => {
+          return (
+            <div key={index} className="comment">
+              <img
+                src={item.snippet.topLevelComment.snippt.authorProfileImage}
+                alt=""
+              />
+              <div>
+                <h3>
+                  {item.snippet.topLevelComment.snippet.authorDisplayName}{" "}
+                  <span>1 day ago</span>
+                </h3>
+                <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
+                <div className="comment-action">
+                  <img src={like} alt="" />
+                  <span>
+                    {value_conveter(
+                      item.snippet.topLevelComment.snippet.likeCount
+                    )}
+                  </span>
+                  <img src={like} alt="" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="comment">
-          <img src={user_profile} alt="" />
-          <div>
-            <h3>
-              Jack Nicholson <span>1 day ago</span>
-            </h3>
-            <p>
-              I enjoy my alone time, I can do what I want, no interuptions, dont
-              have to talk or listen.Thanks a lot for such wonderfull video.
-            </p>
-            <div className="comment-action">
-              <img src={like} alt="" />
-              <span>244</span>
-              <img src={like} alt="" />
-            </div>
-          </div>
-        </div>
-        <div className="comment">
-          <img src={user_profile} alt="" />
-          <div>
-            <h3>
-              Jack Nicholson <span>1 day ago</span>
-            </h3>
-            <p>
-              I enjoy my alone time, I can do what I want, no interuptions, dont
-              have to talk or listen.Thanks a lot for such wonderfull video.
-            </p>
-            <div className="comment-action">
-              <img src={like} alt="" />
-              <span>244</span>
-              <img src={like} alt="" />
-            </div>
-          </div>
-        </div>
-        <div className="comment">
-          <img src={user_profile} alt="" />
-          <div>
-            <h3>
-              Jack Nicholson <span>1 day ago</span>
-            </h3>
-            <p>
-              I enjoy my alone time, I can do what I want, no interuptions, dont
-              have to talk or listen.Thanks a lot for such wonderfull video.
-            </p>
-            <div className="comment-action">
-              <img src={like} alt="" />
-              <span>244</span>
-              <img src={like} alt="" />
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
