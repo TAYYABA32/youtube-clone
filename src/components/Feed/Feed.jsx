@@ -1,6 +1,7 @@
 import "./feed.css";
-import { useState, useEffect } from "react";
-import thumbnail1 from "../../assets/thumbnail1.png";
+import { useEffect, useState } from "react";
+import moment from "moment";
+// import thumbnail1 from "../../assets/thumbnail1.png";
 // import thumbnail2 from "../../assets/thumbnail2.png";
 // import thumbnail3 from "../../assets/thumbnail3.png";
 // import thumbnail4 from "../../assets/thumbnail4.png";
@@ -9,35 +10,40 @@ import thumbnail1 from "../../assets/thumbnail1.png";
 // import thumbnail7 from "../../assets/thumbnail7.png";
 // import thumbnail8 from "../../assets/thumbnail8.png";
 
-import { API_KEY } from "../../data";
+import { API_KEY, value_conveter } from "../../data";
 import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const Feed = ({ category }) => {
   const [data, setData] = useState([]);
-  const fetchData = async () => {
-    const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet.contentDetails.statistics&chart=mostPopular&maxResults=50&videoCategoryId=${category}&key=${API_KEY}`;
-    await fetch(videoList_url)
-      .then((response) => response.json())
-      .then((data) => setData(data.items));
-  };
 
   useEffect(() => {
+    const fetchData = async () => {
+      const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=IN&videoCategoryId=${category}&key=${API_KEY}
+      `;
+      await fetch(videoList_url)
+        .then((response) => response.json())
+        .then((data) => {
+          setData(data.items);
+          console.log(data);
+        });
+    };
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category]);
+  }, [category, data]);
+
   return (
     <div className="feed">
       {data.map((item, index) => {
         return (
+          // eslint-disable-next-line react/jsx-key
           <Link to={`video/20/4521`} key={index} className="card">
-            <img src={thumbnail1} alt="" />
-            <h2>
-              The gladdest moment in human life, me thinks, is a departure
-              intounknown lands.
-            </h2>
-            <h3> Richard Burton</h3>
-            <p>15k views &bull; 2 days ago</p>
+            <img src={item.snippet.thumbnails.medium.url} alt="" />
+            <h2>{item.snippet.title}</h2>
+            <h3>{item.snippet.channelTitle}</h3>
+            <p>
+              {value_conveter(item.statistics.viewCount)} views &bull;{" "}
+              {moment(item.snippet.publishedAt).fromNow()}
+            </p>
           </Link>
         );
       })}
