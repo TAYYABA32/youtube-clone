@@ -1,8 +1,8 @@
-import  { useState } from "react"; // Combine the imports
+import { useState } from "react"; // Combine the imports
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Navbar from "./components/Navbar/Navbar";
-import Video from "./pages/Video/Video"; // Corrected component name
+import Video from "./pages/Video/Video";
 
 const App = () => {
   const [sidebar, setSidebar] = useState(true); // Changed setsidebar to setSidebar
