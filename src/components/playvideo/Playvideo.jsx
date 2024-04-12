@@ -1,5 +1,5 @@
 import "./playvideo.css";
-import video1 from "../../assets/video.mp4";
+// import video1 from "../../assets/video.mp4";
 import like from "../../assets/like.png";
 import dislike from "../../assets/dislike.png";
 import share from "../../assets/share.png";
@@ -7,10 +7,20 @@ import save from "../../assets/save.png";
 import jack from "../../assets/jack.png";
 import user_profile from "../../assets/user_profile.jpg";
 
-const Playvideo = () => {
+// eslint-disable-next-line react/prop-types
+const Playvideo = ({ videoId }) => {
   return (
     <div className="play-video">
-      <video src={video1} controls autoPlay muted></video>
+      {/* <video src={video1} controls autoPlay muted></video> */}
+      {/* <iframe width="1040" height="585" src="https://www.youtube.com/embed/7D4vNcK6D38" title="Coke Studio | Season 14 | Tu Jhoom | Naseebo Lal x Abida Parveen" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> */}
+
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}`}
+        // eslint-disable-next-line react/no-unknown-property
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
       <h3>
         The world is a book and those who do not travel read only one page.
       </h3>
