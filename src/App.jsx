@@ -2,7 +2,7 @@ import { useState } from "react"; // Combine the imports
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Navbar from "./components/Navbar/Navbar";
-import Video from "./pages/Video/Video";
+import Video from "./pages/video/video";
 
 const App = () => {
   const [sidebar, setSidebar] = useState(true); // Changed setsidebar to setSidebar

@@ -1,5 +1,5 @@
 import Recommended from "../../components/Recommended/Recommended";
-import Playvideo from "../../components/playVideo/PlayVideo";
+import Playvideo from "../../components/playvideo/Playvideo";
 import "./video.css";
 const Video = () => {
   return (
