@@ -20,39 +20,56 @@ const Playvideo = () => {
   const [channelData, setChannelData] = useState(null);
   const [commentData, setCommentData] = useState([]);
 
+  console.log("videoId", videoId);
+  console.log("apiData", apiData);
+
   // eslint-disable-next-line no-unused-vars
   const fetchvideoData = async () => {
     // eslint-disable-next-line no-undef, no-unused-vars
-    const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=US&videoCategoryId=${videoId}&key=${API_KEY} `;
+    const videoDetails_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${videoId}&key=${API_KEY} `;
     await fetch(videoDetails_url)
       .then((res) => res.json())
-      .then((data) => setApiData(data.items[0]));
+      .then((data) => {
+        setApiData(data.items[0]);
+      });
   };
 
   // eslint-disable-next-line no-unused-vars
   const fetchOtherData = async () => {
     // eslint-disable-next-line no-unused-vars
-    const channelData_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData.snippet.channelId}&key=${API_KEY} `;
+    console.log(channelData, "channelData");
+
+    const channelData_url = `https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics&id=${apiData?.snippet?.channelId}&key=${API_KEY} `;
     await fetch(channelData_url)
       .then((res) => res.json())
-      .then((data) => setChannelData(data.items[0]));
-
+      .then((data) => {
+        if (data?.items?.length > 0) {
+          setChannelData(data?.items[0]);
+        }
+      });
     // eslint-disable-next-line no-unused-vars
     const comment_url = `https://youtube.googleapis.com/youtube/v3/commentThreads?part=snippet%2Creplies&maxResults=50&videoId=${videoId}&key=${API_KEY} `;
     await fetch(comment_url)
       .then((res) => res.json())
-      .then((data) => setCommentData(data.items));
+      .then((data) => {
+        setCommentData(data.items);
+        console.log(commentData, "commentData");
+      });
   };
 
   useEffect(() => {
-    fetchvideoData();
+    if (videoId) {
+      fetchvideoData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
   useEffect(() => {
-    fetchOtherData();
+    if (apiData?.snippet?.channelId) {
+      fetchOtherData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiData]);
   return (
     <div className="play-video">
       {/* <video src={video1} controls autoPlay muted></video> */}
@@ -60,9 +77,8 @@ const Playvideo = () => {
 
       <iframe
         src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
+        allowFullScreen
       ></iframe>
       <h3>{apiData ? apiData.snippet.title : "Title here"}</h3>
       <div className="play-video-info">
@@ -97,7 +113,7 @@ const Playvideo = () => {
       <hr />
       <div className="publisher">
         <img
-          src={channelData ? channelData.snippet.thumbnail.default.url : ""}
+          src={channelData ? channelData.snippet.thumbnails.default.url : ""}
           alt=""
         />
         <div>
@@ -127,15 +143,18 @@ const Playvideo = () => {
           return (
             <div key={index} className="comment">
               <img
-                src={item.snippet.topLevelComment.snippt.authorProfileImage}
-                alt=""
+                src={
+                  item?.snippet?.topLevelComment?.snippet
+                    ?.authorProfileImageUrl ?? "NA"
+                }
+                alt="NA"
               />
               <div>
                 <h3>
-                  {item.snippet.topLevelComment.snippet.authorDisplayName}{" "}
+                  {item?.snippet?.topLevelComment?.snippet?.authorDisplayName}{" "}
                   <span>1 day ago</span>
                 </h3>
-                <p>{item.snippet.topLevelComment.snippet.textDisplay}</p>
+                <p>{item?.snippet?.topLevelComment?.snippet?.textDisplay}</p>
                 <div className="comment-action">
                   <img src={like} alt="" />
                   <span>
